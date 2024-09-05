@@ -47,7 +47,7 @@ export const signup = async (req, res) => {
 };
 
 export const verifyEmail = async (req, res) => {
-  const { body } = req.body;
+  const { code } = req.body;
 
   try {
     const user = await User.findOne({
@@ -65,7 +65,18 @@ export const verifyEmail = async (req, res) => {
     await user.save();
 
     await sendWelcomeEmailUser(user.email, user.name);
-  } catch (error) {}
+    req.status(200).json({
+      success: true,
+      message: "Email verified Succesfully",
+      user: {
+        ...user._doc,
+        password: undefined,
+      },
+    });
+  } catch (error) {
+    console.log(" error ", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
 };
 export const login = async (req, res) => {
   res.send("login route");
